@@ -72,58 +72,73 @@ const nameProvinceMapping = names.reduce((acc, name, index) => {
   return acc;
 }, {});
 
-// Log the result
-console.log(nameProvinceMapping);
+// advanced exercises
 
-console.log(
-  // Log Products
-  "Log Products:",
-  products.forEach(({ product }) => console.log(product)),
+// Print the name of each product
+products.forEach((product) => console.log(product.product));
 
-  // Filter by Name Length
-  "Filter by Name Length:",
-  products.filter(({ product }) => product.length <= 5),
+// Filter products with names shorter than 6 characters and print the result
+let filteredName = products.filter((product) => product.product.length < 6);
+console.log(filteredName);
 
-  // Price Manipulation
-  "Price Manipulation:",
-  products
-    .filter(
-      ({ price }) =>
-        typeof price === "string" &&
-        price.trim() !== "" &&
-        !isNaN(Number(price))
-    ) // Filter out products without prices, non-numeric prices, and non-string prices
-    .reduce((total, { price }) => total + Number(price), 0), // Calculate the total price
+// Filter out products without valid prices and convert string prices to numbers
+let validProducts = products.filter((product) => {
+  // Convert the price to a number and check if it's a valid number
+  const price = parseFloat(product.price);
+  return !isNaN(price);
+});
 
-  // Concatenate Product Names
-  "Concatenate Product Names:",
-  products.reduce((acc, { product }) => acc + product, ""),
+let productsWithNumericPrices = validProducts.map((item) => ({
+  ...item,
+  price: parseFloat(item.price),
+}));
 
-  // Find Extremes in Prices
-  (() => {
-    const validPrices = products
-      .filter(
-        ({ price }) =>
-          typeof price === "string" &&
-          price.trim() !== "" &&
-          !isNaN(Number(price))
-      )
-      .map(({ product, price }) => ({ product, price: Number(price) }));
-    const highestPriced = validPrices.reduce(
-      (prev, current) => (prev.price > current.price ? prev : current),
-      validPrices[0]
-    );
-    const lowestPriced = validPrices.reduce(
-      (prev, current) => (prev.price < current.price ? prev : current),
-      validPrices[0]
-    );
-    return `Find Extremes in Prices: Highest: ${highestPriced.product}. Lowest: ${lowestPriced.product}.`;
-  })(),
+console.log(productsWithNumericPrices);
 
-  // Object Transformation
-  "Object Transformation:",
-  products.reduce((acc, { product, price }) => {
-    acc.push({ name: product, cost: price });
-    return acc;
-  }, [])
+// Calculate the total price of all valid products
+const totalPrice = productsWithNumericPrices.reduce(
+  (total, item) => total + item.price,
+  0
 );
+console.log(totalPrice);
+
+// Concatenate all product names into a single string
+let concatenatedNames = products
+  .reduce((acc, item) => {
+    return acc + item.product + " ";
+  }, "")
+  .trim();
+console.log(concatenatedNames);
+
+// Use reduce to find the highest and lowest prices
+const extremes = productsWithNumericPrices.reduce(
+  (acc, item) => {
+    if (item.price > acc.highest.price) {
+      acc.highest = item;
+    }
+    if (item.price < acc.lowest.price) {
+      acc.lowest = item;
+    }
+    return acc;
+  },
+  {
+    highest: productsWithNumericPrices[0],
+    lowest: productsWithNumericPrices[0],
+  }
+);
+
+// Format the result string to show the highest and lowest priced items
+const result = `Highest: ${extremes.highest.product} - ${extremes.highest.price}. Lowest: ${extremes.lowest.product} - ${extremes.lowest.price}.`;
+console.log(result);
+
+// Use reduce to transform the product objects to have keys 'name' and 'cost'
+const transformedProducts = products.reduce((acc, item) => {
+  const transformedItem = {
+    name: item.product,
+    cost: item.price,
+  };
+  acc.push(transformedItem);
+  return acc;
+}, []);
+
+console.log(transformedProducts);
